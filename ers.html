@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>系统面板</title>
+		<style type="text/css">
+			td{
+				min-width: 100px;
+				border-bottom: #d1d1d1 1px solid;
+			}
+			td:first-child{
+				text-align: right;
+			}
+		</style>
+	</head>
+	<body>
+		<table class="message">
+			<tbody>
+
+			</tbody>
+		</table>
+	</body>
+
+
+	<!-- 发送请求 -->
+	<script type="text/javascript">
+		//采用ws
+		function getData2() {
+			let fu = document.querySelector('.message tbody');
+			let dom1 = `<tr><td>伦敦金:</td><td>-</td></tr>`;
+			let dom2 = `<tr><td>伦敦银:</td><td>-</td></tr>`;
+			let dom3 = `<tr><td>美元指数:</td><td>-</td></tr>`;
+			let dom4 = `<tr><td>国内黄金T+D:</td><td>-</td></tr>`;
+			let dom5 = `<tr><td>国内白银T+D:</td><td>-</td></tr>`;
+			let dom6 = `<tr><td>美原油:</td><td>-</td></tr>`;
+			let dom7 = `<tr><td>COMEX黄金:</td><td>-</td></tr>`;
+			let dom8 = `<tr><td>COMEX白银:</td><td>-</td></tr>`;
+
+
+			// 接口来自第一黄金网
+			const ws = new WebSocket('wss://ws.dyhjw.com/?token=');
+			let dd = {
+				"cmd": "sub",
+				"codes": ["XAU", "XAG", "USD", "CONC", "AUTD", "AGTD", "GLNC", "SLNC"]
+			}
+			ws.onopen = function(event) {
+				ws.send(1);
+				ws.send(JSON.stringify(dd));
+			};
+
+			// 监听消息事件
+			ws.onmessage = (event) => {
+				const message = JSON.parse(event.data);
+				console.log(message);
+
+				if (message.C == 'XAU') {
+					dom1 = `<tr><td>伦敦金:</td><td>${message.P}（美元/盎司）</td></tr>`;
+				} else if (message.C == 'XAG') {
+					dom2 = `<tr><td>伦敦银:</td><td>${message.P}（美元/盎司）</td></tr>`;
+				} else if (message.C == 'USD') {
+					dom3 = `<tr><td>美元指数:</td><td>${message.P}</td></tr>`;
+				} else if (message.C == 'AUTD') {
+					dom4 = `<tr><td>国内黄金T+D:</td><td>${message.P}（元/克）</td></tr>`;
+				} else if (message.C == 'AGTD') {
+					dom5 = `<tr><td>国内白银T+D:</td><td>${message.P}（元/千克）</td></tr>`;
+				} else if (message.C == 'CONC') {
+					dom6 = `<tr><td>美原油:</td><td>${message.P}（美元/桶）</td></tr>`;
+				} else if (message.C == 'GLNC') {
+					dom7 = `<tr><td>COMEX黄金:</td><td>${message.P}</td></tr>`;
+				} else if (message.C == 'SLNC') {
+					dom8 = `<tr><td>COMEX白银:</td><td>${message.P}</td></tr>`;
+				}
+
+				let s = dom1 + dom2 + dom3 + dom4 + dom5 + dom6 + dom7 + dom8
+
+				fu.innerHTML = s;
+			};
+			// = fu.innerHTML + dom1;
+		}
+		getData2();
+	</script>
+</html>
